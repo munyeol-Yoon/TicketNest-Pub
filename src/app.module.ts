@@ -12,12 +12,12 @@ import { GoodsModule } from './goods/goods.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AuthModule,
+    GoodsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: typeORMConfig,
     }),
-    AuthModule,
-    GoodsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
