@@ -36,15 +36,15 @@ export class AuthService {
         '확인 비밀번호가 입력 비밀번호와 일치하지 않습니다.',
       );
     }
-    const isExistEmail = await this.userRepository.findOne({
+    const isExistEmailOrNickname = await this.userRepository.findOne({
       where: [{ email: email }, { nickname: nickname }],
     });
 
-    if (isExistEmail) {
-      if (isExistEmail.email === email) {
+    if (isExistEmailOrNickname) {
+      if (isExistEmailOrNickname.email === email) {
         throw new NotFoundException('이미 존재하는 이메일 입니다');
       }
-      if (isExistEmail.nickname === nickname) {
+      if (isExistEmailOrNickname.nickname === nickname) {
         throw new NotFoundException('이미 존재하는 닉네임 입니다');
       }
     }
