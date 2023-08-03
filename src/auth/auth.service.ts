@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   ForbiddenException,
   InternalServerErrorException,
+  ConflictException,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,10 +43,10 @@ export class AuthService {
 
     if (isExistEmailOrNickname) {
       if (isExistEmailOrNickname.email === email) {
-        throw new NotFoundException('이미 존재하는 이메일 입니다');
+        throw new ConflictException('이미 존재하는 이메일 입니다');
       }
       if (isExistEmailOrNickname.nickname === nickname) {
-        throw new NotFoundException('이미 존재하는 닉네임 입니다');
+        throw new ConflictException('이미 존재하는 닉네임 입니다');
       }
     }
 

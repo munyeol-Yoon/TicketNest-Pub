@@ -1,6 +1,7 @@
 // 데이터 베이스 모델 생성 장소
 
-import { GoodsEntity } from 'src/goods/entities/goods.entity';
+// import { GoodsEntity } from 'src/goods/entities/goods.entity';
+import { GoodsEntity } from '../../goods/entities/goods.entity';
 import {
   Column,
   Entity,
@@ -30,8 +31,6 @@ export class UserEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => GoodsEntity, (goods) => goods.user, {
-    eager: true,
-  })
+  @OneToMany(() => GoodsEntity, (goods) => goods.user)
   goods: GoodsEntity[];
 }
