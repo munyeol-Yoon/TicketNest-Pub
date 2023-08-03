@@ -1,4 +1,5 @@
-import { UserEntity } from 'src/auth/entities/user.entity';
+// import { UserEntity } from 'src/auth/entities/user.entity';
+import { UserEntity } from '../../auth/entities/user.entity';
 import {
   Column,
   Entity,
@@ -43,7 +44,7 @@ export class GoodsEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.goods, {
     cascade: true,
-    eager: false, // 관계가 항상 자동으로 로드안되게
+    eager: false,
   })
   user: UserEntity;
 }

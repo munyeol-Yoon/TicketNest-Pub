@@ -22,6 +22,7 @@ export class typeORMConfig implements TypeOrmOptionsFactory {
       database: this.configService.get('DB_DATABASE'),
       entities: [UserEntity, GoodsEntity], // TypeORM이 엔티티를 인식할 수 있게 설정
       synchronize: false, //! 주의! 이거 true 되면 데이터베이스 리셋됩니다
+      logging: true, // 개발 편의를 위해 추가, 배포시 지워도 됩니다.
     };
   }
 }
