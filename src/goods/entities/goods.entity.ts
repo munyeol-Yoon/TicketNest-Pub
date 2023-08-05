@@ -3,7 +3,6 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  //   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
@@ -12,10 +11,7 @@ import {
 @Entity()
 export class GoodsEntity {
   @PrimaryGeneratedColumn()
-  postId: number;
-
-  @Column()
-  adminId: number;
+  goodsId: number;
 
   @Column()
   userId: number;
@@ -25,6 +21,9 @@ export class GoodsEntity {
 
   @Column()
   content: string;
+
+  @Column()
+  price: number;
 
   @Column()
   imgUrl: string;
