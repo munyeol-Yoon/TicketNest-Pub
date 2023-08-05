@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
+import { LoginDto, SignUpDto } from './dto/auth.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -9,6 +11,7 @@ describe('AuthController', () => {
   beforeEach(async () => {
     const authServiceMock = {
       signUp: jest.fn(),
+      login: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -58,6 +61,29 @@ describe('AuthController', () => {
       const result = await controller.signUp(signupDto);
 
       expect(result).toEqual({ message: '회원가입 성공' });
+    });
+  });
+  describe('POST /login', () => {
+    // 로그인 테스트
+    it('AuthService.login 의 결과를 쿠키와 json 형식으로 반환 하는가?', async () => {
+      const loginDto: LoginDto = {
+        email: 'test@test.com',
+        password: 'Qwer123$',
+      };
+
+      jest
+        .spyOn(authService, 'login')
+        .mockResolvedValue({ token: `Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx` });
+      const res: Response = { cookie: jest.fn(), json: jest.fn() } as any;
+      await controller.login(loginDto, res);
+      expect(res.cookie).toHaveBeenCalledWith(
+        'Authorization',
+        'Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx',
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        token: `Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx`,
+      });
     });
   });
 });

@@ -59,7 +59,7 @@ export class AuthService {
         password: hashedPassword,
         nickname,
       });
-      this.userRepository.save(user);
+      await this.userRepository.save(user); // await 을 붙이지 않을 경우 save가 안되어도 return 메시지를 반환할 수 있는 문제 발생 예상.
       return { message: '회원가입 성공' };
     } catch (err) {
       throw new InternalServerErrorException({
@@ -77,23 +77,30 @@ export class AuthService {
     }
     const { email, password } = body;
 
-    try {
-      const user = await this.userRepository.findOne({
-        where: { email: email },
-      });
+    // 가입된 유저여야 합니다
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+    });
 
-      // 가입된 유저여야 하고 비밀번호가 일치해야 합니다
-      if (user && (await bcrypt.compare(password, user.password))) {
-        const payload = { email: user.email };
-        const token = this.jwtService.sign(payload, {
-          secret: this.configService.get('JWT_SECRET'),
-        });
-        return { token: `Bearer ${token}` };
-      } else {
-        throw new ForbiddenException({
-          errorMessage: '이메일과 비밀번호를 확인해주세요',
-        });
-      }
+    if (!user) {
+      throw new ForbiddenException({
+        errorMessage: '이메일과 비밀번호를 확인해주세요',
+      });
+    }
+
+    // 비밀번호가 일치해야 합니다
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched) {
+      throw new ForbiddenException({
+        errorMessage: '이메일과 비밀번호를 확인해주세요',
+      });
+    }
+    try {
+      const payload = { email: user.email };
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+      return { token: `Bearer ${token}` };
     } catch (err) {
       throw new InternalServerErrorException({
         errorMessage: '로그인에 실패하였습니다',
