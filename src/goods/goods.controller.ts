@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import { GoodsService } from './goods.service';
 import { GoodsDto } from './dto/goods.dto';
@@ -15,13 +16,13 @@ export class GoodsController {
   constructor(private readonly goodsService: GoodsService) {}
 
   @Get()
-  findAll() {
-    return this.goodsService.findAll();
+  async findAll() {
+    return await this.goodsService.findAll();
   }
 
   @Get(':goodsid')
-  findOne(@Param('goodsid') goodsId: number) {
-    return this.goodsService.findOne(goodsId);
+  async findOne(@Param('goodsid') goodsId: number) {
+    return await this.goodsService.findOne(goodsId);
   }
 
   @Post()
@@ -30,12 +31,18 @@ export class GoodsController {
   }
 
   @Patch(':goodsid')
-  patch(@Param('goodsid') goodsId: number, @Body() body: GoodsDto) {
-    return this.goodsService.updateOne(goodsId, body);
+  async patch(
+    @Param('goodsid') goodsId: number,
+    @Body() body: GoodsDto,
+    @Res() res,
+  ) {
+    await this.goodsService.patch(goodsId, body);
+    return res.json({ message: '공연 예매 완료' });
   }
 
   @Delete(':goodsid')
-  remove(@Param('goodsid') goodsId: number) {
-    this.goodsService.deleteOne(goodsId);
+  async remove(@Param('goodsid') goodsId: number, @Res() res) {
+    await this.goodsService.remove(goodsId);
+    return res.json({ message: '공연 취소 완료' });
   }
 }

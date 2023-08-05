@@ -12,62 +12,63 @@ export class GoodsService {
   ) {}
 
   async findAll(): Promise<GoodsEntity[]> {
-    return this.goodsRepository.find();
+    return await this.goodsRepository.find();
   }
 
   async findOne(goodsid: number): Promise<GoodsEntity> {
-    const goods = this.goodsRepository.findOne({ where: { goodsId: goodsid } });
+    const goods = await this.goodsRepository.findOne({
+      where: { goodsId: goodsid },
+    });
+
     if (!goods) {
       throw new NotFoundException({
-        errorMessage: '공연 정보가 존재하지 않습니다.',
+        errorMessage: '공연을 찾을 수 없습니다',
       });
     }
+
     return goods;
   }
 
   async create(goodsData: GoodsDto): Promise<GoodsEntity> {
-    const { userId, title, content, price, imgUrl, showDate, bookingLimit } =
-      goodsData;
-    const goods = this.goodsRepository.create({
-      userId,
-      title,
-      content,
-      price,
-      imgUrl,
-      showDate,
-      bookingLimit,
-    });
+    const goods = this.goodsRepository.create(goodsData);
 
     await this.goodsRepository.save(goods);
     return goods;
   }
 
-  async updateOne(goodsid: number, updateData: updateGoodsDto) {
-    const { title, content, price, imgUrl, showDate, bookingLimit } =
-      updateData;
+  async patch(goodsid: number, updateData: updateGoodsDto) {
     const updateTarget = await this.goodsRepository.findOne({
       where: { goodsId: goodsid },
     });
 
     if (!updateTarget) {
       throw new NotFoundException({
-        errorMessage: '공연 정보가 존재하지 않습니다.',
+        errorMessage: '공연을 찾을 수 없습니다',
       });
     }
 
-    const goods = await this.goodsRepository.update(goodsid, {
-      title,
-      content,
-      price,
-      imgUrl,
-      showDate,
-      bookingLimit,
-    });
+    // 오른쪽의 속성을 왼쪽의 엔티티에 복사한다.
+    Object.assign(updateTarget, updateData);
+
+    // 왜 이렇게 작성하였는가?
+    // MySQL 처럼 모든 속성들을 다 가져와서 하나씩 수정하기에는 번거로움이 있다.
+    // 또한, 결과값이 어떤 것을 수정했는지에 대한 정보가 보이지 않아서 불편함이 있다.
+
+    const updateGoods = await this.goodsRepository.save(updateTarget);
+    return updateGoods;
   }
 
-  async deleteOne(goodsid: number): Promise<void> {
+  async remove(goodsid: number): Promise<boolean> {
     const deleteTarget = await this.goodsRepository.delete({
       goodsId: goodsid,
     });
+
+    if (!deleteTarget) {
+      throw new NotFoundException({
+        errorMessage: '공연을 찾을 수 없습니다',
+      });
+    }
+
+    return deleteTarget.affected > 0;
   }
 }
