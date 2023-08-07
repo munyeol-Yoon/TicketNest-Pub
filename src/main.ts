@@ -1,9 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Swagger 띄우기
+  const config = new DocumentBuilder()
+    .setTitle('TicketNest')
+    .setDescription('TicketNest API description')
+    .setVersion('1.0')
+    .addTag('tickets')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   //* 전역 pipe 설정 (data transformation 및 data validation 할 수 있게 해줌)
   // DTO 데이터 검증 및 입력 데이터를 원하는 형식으로 변환. 즉, 파이프가 입력 데이터르 원하는 형식으로 변환시켜줌(EX. string "7" -> number 7)
