@@ -17,7 +17,7 @@ export class GoodsService {
 
   async findOne(goodsid: number): Promise<GoodsEntity> {
     const goods = await this.goodsRepository.findOne({
-      where: { goodsId: goodsid },
+      where: { id: goodsid },
     });
 
     if (!goods) {
@@ -38,7 +38,7 @@ export class GoodsService {
 
   async patch(goodsid: number, updateData: updateGoodsDto) {
     const updateTarget = await this.goodsRepository.findOne({
-      where: { goodsId: goodsid },
+      where: { id: goodsid },
     });
 
     if (!updateTarget) {
@@ -60,7 +60,7 @@ export class GoodsService {
 
   async remove(goodsid: number): Promise<boolean> {
     const deleteTarget = await this.goodsRepository.delete({
-      goodsId: goodsid,
+      id: goodsid,
     });
 
     if (!deleteTarget) {
