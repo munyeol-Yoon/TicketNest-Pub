@@ -16,11 +16,11 @@ import { BookingModule } from './booking/booking.module';
     }),
     AuthModule,
     GoodsModule,
+    BookingModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: typeORMConfig,
     }),
-    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

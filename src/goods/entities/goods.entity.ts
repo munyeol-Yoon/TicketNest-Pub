@@ -14,7 +14,7 @@ import {
 @Entity()
 export class GoodsEntity {
   @PrimaryGeneratedColumn()
-  goodsId: number;
+  id: number;
 
   @Column()
   userId: number;

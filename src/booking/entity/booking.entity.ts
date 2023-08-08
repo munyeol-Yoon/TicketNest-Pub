@@ -5,7 +5,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class BookingEntity {
   @PrimaryGeneratedColumn()
-  bookingId: number;
+  id: number;
 
   @Column({
     nullable: false,
