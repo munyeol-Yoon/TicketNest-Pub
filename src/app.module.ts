@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { typeORMConfig } from './config/orm.config';
 import { GoodsModule } from './goods/goods.module';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
       imports: [ConfigModule],
       useClass: typeORMConfig,
     }),
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,5 @@
 // import { UserEntity } from 'src/auth/entities/user.entity';
+import { BookingEntity } from 'src/booking/entity/booking.entity';
 import { UserEntity } from '../../auth/entities/user.entity';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -46,4 +48,7 @@ export class GoodsEntity {
     eager: false,
   })
   user: UserEntity;
+
+  @OneToMany(() => BookingEntity, (booking) => booking.goods)
+  booking: BookingEntity[];
 }
