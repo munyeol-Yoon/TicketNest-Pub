@@ -7,6 +7,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { PickType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SignUpDto {
   @IsEmail(
@@ -17,6 +18,10 @@ export class SignUpDto {
   )
   @IsNotEmpty({
     message: '이메일은 필수 입력 항목입니다',
+  })
+  @ApiProperty({
+    description: 'Email형식이어야 합니다.',
+    nullable: false,
   })
   email: string;
 
@@ -42,6 +47,11 @@ export class SignUpDto {
         '비밀번호는 최소 8자리의 문자열이며, 대문자, 소문자, 숫자, 특수문자가 최소 1개씩은 포함 되어야 합니다',
     },
   )
+  @ApiProperty({
+    nullable: false,
+    description:
+      '비밀번호는 최소 8자리의 문자열이며, 대문자, 소문자, 숫자, 특수문자가 최소 1개씩은 포함 되어야 합니다',
+  })
   password: string;
 
   @IsString()
@@ -66,6 +76,11 @@ export class SignUpDto {
         '확인 비밀번호는 최소 8자리의 문자열이며, 대문자, 소문자, 숫자, 특수문자가 최소 1개씩은 포함 되어야 합니다',
     },
   )
+  @ApiProperty({
+    description:
+      '확인 비밀번호는 최소 8자리의 문자열이며, 대문자, 소문자, 숫자, 특수문자가 최소 1개씩은 포함 되어야 합니다',
+    nullable: false,
+  })
   confirm: string;
 
   @IsString({
@@ -79,6 +94,10 @@ export class SignUpDto {
   })
   @MaxLength(10, {
     message: '닉네임은 10글자 이내여야합니다.',
+  })
+  @ApiProperty({
+    nullable: false,
+    description: '닉네임은 공백을 포함할 수 없으며, 10글자 이내여야 합니다.',
   })
   nickname: string;
 }
