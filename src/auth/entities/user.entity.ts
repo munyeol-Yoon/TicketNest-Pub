@@ -1,7 +1,7 @@
 // 데이터 베이스 모델 생성 장소
 
 // import { GoodsEntity } from 'src/goods/entities/goods.entity';
-import { BookingEntity } from 'src/booking/entity/booking.entity';
+import { BookingEntity } from '../../booking/entity/booking.entity';
 import { GoodsEntity } from '../../goods/entities/goods.entity';
 import {
   Column,

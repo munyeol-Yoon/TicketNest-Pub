@@ -15,10 +15,10 @@ export class BookingController {
   @Post(':goodsId')
   async createBooking(
     @Param('goodsId') goodsId: number,
-    @Body() Body,
+    @Body('userId') userId: number,
     @Res() res: Response,
   ) {
-    const { userId } = Body;
+    console.log(userId);
     await this.bookingService.createBooking(goodsId, userId);
     return res.status(201).json({ message: '공연 예약 완료!' });
   }
