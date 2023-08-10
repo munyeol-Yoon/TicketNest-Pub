@@ -1,5 +1,5 @@
 // import { UserEntity } from 'src/auth/entities/user.entity';
-import { BookingEntity } from 'src/booking/entity/booking.entity';
+import { BookingEntity } from '../../booking/entity/booking.entity';
 import { UserEntity } from '../../auth/entities/user.entity';
 import {
   Column,
