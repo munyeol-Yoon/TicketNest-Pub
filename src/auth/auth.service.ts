@@ -99,7 +99,6 @@ export class AuthService {
       const payload = { userId: user.id };
 
       const accessToken = this.jwtService.sign(payload);
-      console.log(accessToken);
       // return { token: `Bearer ${token}` };
       return { accessToken };
     } catch (err) {
