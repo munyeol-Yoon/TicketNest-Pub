@@ -18,6 +18,7 @@ config();
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  // exports에 추가하면 다른 모듈에서도 사용할 수 있음.
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}
