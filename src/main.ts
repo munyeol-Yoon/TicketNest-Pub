@@ -32,6 +32,6 @@ async function bootstrap() {
     // exposedHeaders: ['Authorization'], // CORS 요청 후 클라이언트 측에서 브라우저가 액세스할 수 있는 헤더
   });
 
-  await app.listen(3000);
+  await app.listen(8080);
 }
 bootstrap();
