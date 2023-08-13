@@ -36,8 +36,13 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.7",
     "@nestjs/typeorm": "^10.0.0",
+<<<<<<< HEAD
     "bcryptjs": "^2.4.3",
     "@types/passport-jwt": "^3.0.9",
+=======
+    "@types/passport-jwt": "^3.0.9",
+    "bcrypt": "^5.1.0",
+>>>>>>> 2f4ba64ea75d9165459f838acbad65be6ce4d31a
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^16.3.1",
