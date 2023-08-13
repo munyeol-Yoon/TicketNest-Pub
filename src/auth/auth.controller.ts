@@ -1,8 +1,17 @@
-import { Body, Controller, Post, Get, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Res,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, SignUpDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('/api/auth')
@@ -21,8 +30,8 @@ export class AuthController {
   })
   @Post('login')
   async login(@Body() body: LoginDto, @Res() res: Response) {
-    const { token } = await this.authService.login(body);
-    res.cookie('Authorization', token);
-    return res.json({ token });
+    const { accessToken } = await this.authService.login(body);
+    // res.cookie('Authorization', token);
+    return res.json({ accessToken });
   }
 }

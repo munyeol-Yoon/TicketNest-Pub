@@ -44,8 +44,13 @@ describe('BookingController', () => {
     // 모의 객체는 실제 Response 객체의 전체 API를 구현하지 않는다.
     // 따라서 unknown으로 타입을 변환하고, Response로 타입을 변환해 타입 체크 오류를 피할 수 있다.
 
+    //* 컨트롤러 코드엔 const userId = req.user 로 되어있음. 하지만 테스트 코드에는 객체안에 user 속성이 없었기 때문에 undefined 에러가 났던것. 그래서 mockReq를 만들어 해결.
+    const mockReq = {
+      user: 111,
+    };
+
     // booking controller의 createBooking을 호출
-    await controller.createBooking(goodsId, userId, mockRes);
+    await controller.createBooking(goodsId, mockReq, mockRes);
 
     // Service의 createBooking에 올바른 인자값이 호출되었는가?
     expect(bookingService.createBooking).toHaveBeenCalledWith(goodsId, userId);
@@ -63,7 +68,11 @@ describe('BookingController', () => {
       json: jest.fn(),
     } as unknown as Response;
 
-    await controller.deleteBooking(goodsId, userId, mockRes);
+    const mockReq = {
+      user: 111,
+    };
+
+    await controller.deleteBooking(goodsId, mockReq, mockRes);
     // Service의 createBooking에 올바른 인자값이 호출되었는가?
     expect(bookingService.deleteBooking).toHaveBeenCalledWith(goodsId, userId);
     // Controller의 status와 json이 제대로 호출되었는가?

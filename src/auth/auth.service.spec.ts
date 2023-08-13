@@ -171,7 +171,7 @@ describe('AuthService', () => {
 
       const result = await service.login(loginDto);
       const expected = {
-        token: `Bearer ${token}`,
+        accessToken: token,
       };
       expect(result).toEqual(expected);
     });

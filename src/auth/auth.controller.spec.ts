@@ -65,7 +65,7 @@ describe('AuthController', () => {
   });
   describe('POST /login', () => {
     // 로그인 테스트
-    it('AuthService.login 의 결과를 쿠키와 json 형식으로 반환 하는가?', async () => {
+    it('AuthService.login 의 결과를 json 형식으로 반환 하는가?', async () => {
       const loginDto: LoginDto = {
         email: 'test@test.com',
         password: 'Qwer123$',
@@ -73,16 +73,12 @@ describe('AuthController', () => {
 
       jest
         .spyOn(authService, 'login')
-        .mockResolvedValue({ token: `Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx` });
+        .mockResolvedValue({ accessToken: '20dfhGdfnsd.ndkfhasd.zxcnvkx' });
       const res: Response = { cookie: jest.fn(), json: jest.fn() } as any;
       await controller.login(loginDto, res);
-      expect(res.cookie).toHaveBeenCalledWith(
-        'Authorization',
-        'Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx',
-      );
 
       expect(res.json).toHaveBeenCalledWith({
-        token: `Bearer 20dfhGdfnsd.ndkfhasd.zxcnvkx`,
+        accessToken: '20dfhGdfnsd.ndkfhasd.zxcnvkx',
       });
     });
   });

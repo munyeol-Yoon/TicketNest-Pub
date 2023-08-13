@@ -96,12 +96,13 @@ export class AuthService {
       });
     }
     try {
-      const payload = { email: user.email };
-      const token = this.jwtService.sign(payload, {
-        secret: this.configService.get('JWT_SECRET'),
-      });
-      return { token: `Bearer ${token}` };
+      const payload = { userId: user.id };
+
+      const accessToken = this.jwtService.sign(payload);
+      // return { token: `Bearer ${token}` };
+      return { accessToken };
     } catch (err) {
+      console.error(err);
       throw new InternalServerErrorException({
         errorMessage: '로그인에 실패하였습니다',
       });
