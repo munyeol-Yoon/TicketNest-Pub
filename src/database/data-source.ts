@@ -15,9 +15,9 @@ const options: DataSourceOptions & SeederOptions = {
   migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'migrations',
   seeds: ['src/database/seeds/*{.ts,.js}'],
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  // ssl: {
+  //   rejectUnauthorized: false,
+  // },
 };
 
 export const dataSource = new DataSource(options);
