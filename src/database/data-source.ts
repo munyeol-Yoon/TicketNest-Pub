@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
+import UserSeeder from './seeds/user.seeder';
+import GoodsSeeder from './seeds/goods.seeder';
 
 config({ path: '.env' });
 
@@ -14,7 +16,7 @@ const options: DataSourceOptions & SeederOptions = {
   entities: ['src/**/*.entity{.ts,.js}'],
   migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'migrations',
-  seeds: ['src/database/seeds/*{.ts,.js}'],
+  seeds: [UserSeeder, GoodsSeeder],
   // ssl: {
   //   rejectUnauthorized: false,
   // },
