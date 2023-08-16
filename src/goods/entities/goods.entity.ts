@@ -37,6 +37,11 @@ export class GoodsEntity {
   @Column()
   bookingLimit: number;
 
+  @Column({
+    default: 0,
+  })
+  bookingCount: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
