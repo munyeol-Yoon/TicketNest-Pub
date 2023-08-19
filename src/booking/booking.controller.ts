@@ -22,8 +22,8 @@ export class BookingController {
     summary: '공연 예약 API',
     description: '공연 예약을 합니다.',
   })
-  @Post(':goodsId')
   @UseGuards(AuthGuard('jwt')) //  토큰을 검증하고 해당 유저의 정보를 req 객체에 담아주는 역할
+  @Post(':goodsId')
   async createBooking(
     @Param('goodsId') goodsId: number,
     // @Body('userId') userId: number,
@@ -39,8 +39,8 @@ export class BookingController {
     summary: '공연 예약취소 API',
     description: '공연 예약을 취소합니다.',
   })
-  @Delete(':goodsId')
   @UseGuards(AuthGuard('jwt'))
+  @Delete(':goodsId')
   async deleteBooking(
     @Param('goodsId') goodsId: number,
     // @Body() userId: number,
