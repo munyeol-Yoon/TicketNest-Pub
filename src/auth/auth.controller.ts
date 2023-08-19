@@ -31,7 +31,10 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginDto, @Res() res: Response) {
     const { accessToken } = await this.authService.login(body);
-    // res.cookie('Authorization', token);
+    res.cookie('Authorization', accessToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
     return res.json({ accessToken });
   }
 }
