@@ -99,8 +99,9 @@ export class AuthService {
       const payload = { userId: user.id };
 
       const accessToken = this.jwtService.sign(payload);
-      // return { token: `Bearer ${token}` };
-      return { accessToken };
+      // return { accessToken: `Bearer ${accessToken}` };
+      return { accessToken: accessToken };
+      // return { accessToken };
     } catch (err) {
       console.error(err);
       throw new InternalServerErrorException({
