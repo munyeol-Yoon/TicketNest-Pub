@@ -8,6 +8,8 @@ import { typeORMConfig } from './config/orm.config';
 import { GoodsModule } from './goods/goods.module';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { BookingModule } from './booking/booking.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ApmInterceptor } from './Interceptor/apm.interceptor';
 
 @Module({
   imports: [
@@ -23,10 +25,17 @@ import { BookingModule } from './booking/booking.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ApmInterceptor,
+    },
+    AppService,
+  ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
+//   implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(LoggingMiddleware).forRoutes('*');
+//   }
+// }

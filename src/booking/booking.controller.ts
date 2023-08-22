@@ -22,15 +22,15 @@ export class BookingController {
     summary: '공연 예약 API',
     description: '공연 예약을 합니다.',
   })
-  @UseGuards(AuthGuard('jwt')) //  토큰을 검증하고 해당 유저의 정보를 req 객체에 담아주는 역할
+  // @UseGuards(AuthGuard('jwt')) //  토큰을 검증하고 해당 유저의 정보를 req 객체에 담아주는 역할
   @Post(':goodsId')
   async createBooking(
     @Param('goodsId') goodsId: number,
-    // @Body('userId') userId: number,
-    @Req() req,
+    @Body('userId') userId: number,
+    // @Req() req,
     @Res() res: Response,
   ) {
-    const userId = req.user; // 객체안에 user키의 값을 담아줌
+    // const userId = req.user; // 객체안에 user키의 값을 담아줌
     await this.bookingService.createBooking(goodsId, userId);
     return res.status(201).json({ message: '공연 예약 완료!' });
   }

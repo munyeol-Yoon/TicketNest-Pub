@@ -2,9 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as apm from 'elastic-apm-node';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  apm.start({
+    serviceName: 'TicketNest',
+    serverUrl: 'http://localhost:8200',
+  });
 
   // Swagger 띄우기
   const config = new DocumentBuilder()

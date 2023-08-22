@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entity/booking.entity';
 import { DataSource, Repository } from 'typeorm';
 import { GoodsEntity } from '../goods/entities/goods.entity';
+import * as apm from 'elastic-apm-node';
 
 @Injectable()
 export class BookingService {
@@ -20,11 +21,15 @@ export class BookingService {
   async createBooking(goodsId: number, userId: number) {
     //Transaction 적용을 위한 queryRunner 사용
     const queryRunner = this.dataSource.createQueryRunner();
+    const queryRunnerSpan = apm.startSpan('QueryRunner');
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
-
+    queryRunnerSpan.end();
     try {
       // 1. 예매수 및 Limit 확인
+      // span 추가
+      const findGoodsSpan = apm.startSpan('findGoodsSpan');
+
       const findGoods = await queryRunner.manager.findOne(GoodsEntity, {
         where: { id: goodsId },
         select: { id: true, bookingLimit: true, bookingCount: true },
@@ -32,20 +37,24 @@ export class BookingService {
         // Transaction을 진행중인 동안, 다른 Transaction이 읽기를 금지하기 위해
         lock: { mode: 'pessimistic_write' },
       });
-      console.log(findGoods.bookingCount);
       // 2. 예매 limit보다 많을 경우, Error 처리 진행
+      findGoodsSpan.end();
       if (findGoods.bookingCount >= findGoods.bookingLimit) {
         throw new ConflictException({
           errorMessage: '남은 좌석이 없습니다.',
         });
       }
       ++findGoods.bookingCount;
-      console.log(findGoods.bookingCount);
       // GoodsEntity의 BookingCount 업데이트
+
+      const goodsUpdateSpan = apm.startSpan('goodsUpdateSpan');
       await queryRunner.manager.save(GoodsEntity, findGoods, {
         transaction: true,
       });
+      goodsUpdateSpan.end();
       // BookingEntity에 예매 진행
+
+      const bookingSaveSpan = apm.startSpan('bookingSaveSpan');
       await queryRunner.manager.save(
         BookingEntity,
         {
@@ -54,6 +63,8 @@ export class BookingService {
         },
         { transaction: true },
       );
+
+      bookingSaveSpan.end();
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
