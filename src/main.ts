@@ -3,13 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as apm from 'elastic-apm-node';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService: ConfigService = app.get(ConfigService);
 
   apm.start({
     serviceName: 'API_POST_TEST',
-    serverUrl: 'http://localhost:8200',
+    serverUrl: configService.get<string>('APM_SERVER_URL'),
   });
 
   // Swagger 띄우기
