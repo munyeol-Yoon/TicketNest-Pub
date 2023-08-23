@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   apm.start({
-    serviceName: 'TicketNest',
+    serviceName: 'API_POST_TEST',
     serverUrl: 'http://localhost:8200',
   });
 

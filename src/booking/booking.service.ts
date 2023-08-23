@@ -21,50 +21,59 @@ export class BookingService {
   async createBooking(goodsId: number, userId: number) {
     //Transaction 적용을 위한 queryRunner 사용
     const queryRunner = this.dataSource.createQueryRunner();
-    const queryRunnerSpan = apm.startSpan('QueryRunner');
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
-    queryRunnerSpan.end();
+    const qb = queryRunner.manager.createQueryBuilder();
     try {
       // 1. 예매수 및 Limit 확인
       // span 추가
       const findGoodsSpan = apm.startSpan('findGoodsSpan');
-
-      const findGoods = await queryRunner.manager.findOne(GoodsEntity, {
-        where: { id: goodsId },
-        select: { id: true, bookingLimit: true, bookingCount: true },
-        // lock 수준을 배타락으로 설정
-        // Transaction을 진행중인 동안, 다른 Transaction이 읽기를 금지하기 위해
-        lock: { mode: 'pessimistic_write' },
-      });
-      // 2. 예매 limit보다 많을 경우, Error 처리 진행
+      const findGoods = await qb
+        .select([
+          'GoodsEntity.id',
+          'GoodsEntity.bookingLimit',
+          'GoodsEntity.bookingCount',
+        ])
+        .from(GoodsEntity, 'GoodsEntity')
+        .where('id=:id', { id: goodsId })
+        .setLock('pessimistic_write')
+        .getOne();
       findGoodsSpan.end();
+
+      // 2. 예매 limit보다 많을 경우, Error 처리 진행
       if (findGoods.bookingCount >= findGoods.bookingLimit) {
         throw new ConflictException({
           errorMessage: '남은 좌석이 없습니다.',
         });
       }
-      ++findGoods.bookingCount;
-      // GoodsEntity의 BookingCount 업데이트
 
+      // goods update ms측정
       const goodsUpdateSpan = apm.startSpan('goodsUpdateSpan');
-      await queryRunner.manager.save(GoodsEntity, findGoods, {
-        transaction: true,
-      });
+      // GoodsEntity의 BookingCount 업데이트
+      await qb
+        .update(GoodsEntity)
+        .set({
+          bookingCount: () => 'bookingCount + 1',
+        })
+        .where('id = :id', { id: goodsId })
+        .useTransaction(true)
+        .execute();
       goodsUpdateSpan.end();
-      // BookingEntity에 예매 진행
 
+      //Booking insert ms 측정
       const bookingSaveSpan = apm.startSpan('bookingSaveSpan');
-      await queryRunner.manager.save(
-        BookingEntity,
-        {
+      // bookingEntity Insert 진행
+      await qb
+        .insert()
+        .into(BookingEntity)
+        .values({
           goodsId,
           userId,
-        },
-        { transaction: true },
-      );
-
+        })
+        .useTransaction(true)
+        .execute();
       bookingSaveSpan.end();
+
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
