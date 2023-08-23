@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entity/booking.entity';
 import { DataSource, Repository } from 'typeorm';
 import { GoodsEntity } from '../goods/entities/goods.entity';
+import * as apm from 'elastic-apm-node';
 
 @Injectable()
 export class BookingService {
@@ -22,38 +23,57 @@ export class BookingService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
-
+    const qb = queryRunner.manager.createQueryBuilder();
     try {
       // 1. 예매수 및 Limit 확인
-      const findGoods = await queryRunner.manager.findOne(GoodsEntity, {
-        where: { id: goodsId },
-        select: { id: true, bookingLimit: true, bookingCount: true },
-        // lock 수준을 배타락으로 설정
-        // Transaction을 진행중인 동안, 다른 Transaction이 읽기를 금지하기 위해
-        lock: { mode: 'pessimistic_write' },
-      });
-      console.log(findGoods.bookingCount);
+      // span 추가
+      const findGoodsSpan = apm.startSpan('findGoodsSpan');
+      const findGoods = await qb
+        .select([
+          'GoodsEntity.id',
+          'GoodsEntity.bookingLimit',
+          'GoodsEntity.bookingCount',
+        ])
+        .from(GoodsEntity, 'GoodsEntity')
+        .where('id=:id', { id: goodsId })
+        .setLock('pessimistic_write')
+        .getOne();
+      findGoodsSpan.end();
+
       // 2. 예매 limit보다 많을 경우, Error 처리 진행
       if (findGoods.bookingCount >= findGoods.bookingLimit) {
         throw new ConflictException({
           errorMessage: '남은 좌석이 없습니다.',
         });
       }
-      ++findGoods.bookingCount;
-      console.log(findGoods.bookingCount);
+
+      // goods update ms측정
+      const goodsUpdateSpan = apm.startSpan('goodsUpdateSpan');
       // GoodsEntity의 BookingCount 업데이트
-      await queryRunner.manager.save(GoodsEntity, findGoods, {
-        transaction: true,
-      });
-      // BookingEntity에 예매 진행
-      await queryRunner.manager.save(
-        BookingEntity,
-        {
+      await qb
+        .update(GoodsEntity)
+        .set({
+          bookingCount: () => 'bookingCount + 1',
+        })
+        .where('id = :id', { id: goodsId })
+        .useTransaction(true)
+        .execute();
+      goodsUpdateSpan.end();
+
+      //Booking insert ms 측정
+      const bookingSaveSpan = apm.startSpan('bookingSaveSpan');
+      // bookingEntity Insert 진행
+      await qb
+        .insert()
+        .into(BookingEntity)
+        .values({
           goodsId,
           userId,
-        },
-        { transaction: true },
-      );
+        })
+        .useTransaction(true)
+        .execute();
+      bookingSaveSpan.end();
+
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
