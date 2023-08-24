@@ -10,10 +10,12 @@ import { DataSource, Repository } from 'typeorm';
 import { GoodsEntity } from '../goods/entities/goods.entity';
 import * as apm from 'elastic-apm-node';
 import Redis from 'ioredis';
+import Redlock from 'redlock';
 
 @Injectable()
 export class BookingService {
   private redisClient: Redis;
+  private redlock: Redlock;
   constructor(
     @InjectRepository(BookingEntity)
     private bookingRepository: Repository<BookingEntity>,
@@ -23,12 +25,21 @@ export class BookingService {
     @Inject('REDIS_CLIENT') redisClient: Redis,
   ) {
     this.redisClient = redisClient;
+    this.redlock = new Redlock([redisClient], {
+      driftFactor: 0.01, // clock drift를 보상하기 위해 driftTime 지정에 사용되는 요소, 해당 값과 아래 ttl값을 곱하여 사용.
+      retryCount: 10, // 에러 전까지 재시도 최대 횟수
+      retryDelay: 200, // 각 시도간의 간격
+      retryJitter: 200, // 재시도시 더해지는 되는 무작위 시간(ms)
+    });
   }
   async createBooking(goodsId: number, userId: number) {
     //Transaction 적용을 위한 queryRunner 사용
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
+    const lockResource = [`goodsId:${goodsId}:lock`]; // 락을 식별하는 고유 문자열
+    const lock = await this.redlock.acquire(lockResource, 2000); // 2초 뒤에 자동 잠금해제
+
     const qb = queryRunner.manager.createQueryBuilder();
     try {
       // 1. 예매수 및 Limit 확인
@@ -116,6 +127,7 @@ export class BookingService {
       // error를 Transaction 블록 외부로 던지기 위함
       throw err;
     } finally {
+      await lock.release();
       await queryRunner.release();
     }
     // Transaction 정상 시 성공 메세지 출력
