@@ -11,11 +11,13 @@ import { GoodsEntity } from '../goods/entities/goods.entity';
 import * as apm from 'elastic-apm-node';
 import Redis from 'ioredis';
 import Redlock from 'redlock';
+import subRedis from 'ioredis';
 
 @Injectable()
 export class BookingService {
   private redisClient: Redis;
   private redlock: Redlock;
+  private subscriber: Redis;
   constructor(
     @InjectRepository(BookingEntity)
     private bookingRepository: Repository<BookingEntity>,
@@ -25,11 +27,26 @@ export class BookingService {
     @Inject('REDIS_CLIENT') redisClient: Redis,
   ) {
     this.redisClient = redisClient;
+    this.subscriber = new subRedis(); // 구독을 위해 별도의 클라이언트 생성
     this.redlock = new Redlock([redisClient], {
       driftFactor: 0.01, // clock drift를 보상하기 위해 driftTime 지정에 사용되는 요소, 해당 값과 아래 ttl값을 곱하여 사용.
       retryCount: 10, // 에러 전까지 재시도 최대 횟수
       retryDelay: 200, // 각 시도간의 간격
       retryJitter: 200, // 재시도시 더해지는 되는 무작위 시간(ms)
+    });
+
+    // 구독자 생성
+    this.subscriber.subscribe('Ticket');
+    this.subscriber.on('message', async (channel, message) => {
+      if (channel === 'Ticket') {
+        // const data = JSON.parse(message);
+        try {
+          // await this.createBooking(data.goodsId, data.userId);
+          console.log(message);
+        } catch (err) {
+          console.error(err);
+        }
+      }
     });
   }
   async createBooking(goodsId: number, userId: number) {
@@ -37,6 +54,7 @@ export class BookingService {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
+    const channel = 'Ticket';
     const lockResource = [`goodsId:${goodsId}:lock`]; // 락을 식별하는 고유 문자열
     const lock = await this.redlock.acquire(lockResource, 2000); // 2초 뒤에 자동 잠금해제
 
@@ -91,19 +109,19 @@ export class BookingService {
         return { message: '예매가 초과되어 대기자 명단에 등록 되었습니다' };
       }
 
-      // goods update ms측정
-      const goodsUpdateSpan = apm.startSpan('goodsUpdateSpan');
-      // GoodsEntity의 BookingCount 업데이트
-      await qb
-        .update(GoodsEntity)
-        .set({
-          bookingCount: () => 'bookingCount + 1',
-        })
-        .where('id = :id', { id: goodsId })
-        .useTransaction(true)
-        .execute();
+      // // goods update ms측정
+      // const goodsUpdateSpan = apm.startSpan('goodsUpdateSpan');
+      // // GoodsEntity의 BookingCount 업데이트
+      // await qb
+      //   .update(GoodsEntity)
+      //   .set({
+      //     bookingCount: () => 'bookingCount + 1',
+      //   })
+      //   .where('id = :id', { id: goodsId })
+      //   .useTransaction(true)
+      //   .execute();
 
-      goodsUpdateSpan.end();
+      // goodsUpdateSpan.end();
 
       //Booking insert ms 측정
       const bookingSaveSpan = apm.startSpan('bookingSaveSpan');
@@ -129,6 +147,10 @@ export class BookingService {
     } finally {
       await lock.release();
       await queryRunner.release();
+      await this.redisClient.publish(
+        channel,
+        `goodsId:${goodsId}의 락이 해제되었습니다`,
+      );
     }
     // Transaction 정상 시 성공 메세지 출력
     return { message: '예약 성공!' };
@@ -139,6 +161,7 @@ export class BookingService {
       userId,
       goodsId,
     });
+    await this.redisClient.decr(`goodsId:${goodsId}`);
 
     if (!deleteBooking)
       throw new NotFoundException({
