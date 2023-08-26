@@ -10,26 +10,29 @@ import { DataSource, Repository } from 'typeorm';
 import { GoodsEntity } from '../goods/entities/goods.entity';
 import * as apm from 'elastic-apm-node';
 import Redis from 'ioredis';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class BookingService {
   constructor(
     @InjectRepository(BookingEntity)
     private bookingRepository: Repository<BookingEntity>,
-    @InjectRepository(GoodsEntity)
-    private goodsRepository: Repository<GoodsEntity>,
-    private dataSource: DataSource,
     @Inject('REDIS_CLIENT') private redisClient: Redis,
+    @InjectQueue('Ticket') private ticketQueue: Queue,
   ) {
     this.redisClient = redisClient;
   }
   async createBooking(goodsId: number, userId: number) {
     const pubSpan = apm.startSpan('pubSpan');
-    await this.redisClient.publish(
-      'Ticket',
-      JSON.stringify({ goodsId, userId }),
+    await this.ticketQueue.add(
+      'createBooking',
+      {
+        goodsId,
+        userId,
+      },
+      { removeOnComplete: true },
     );
-    await this.redisClient.incr(`goodsId:${goodsId}`);
     pubSpan.end();
 
     // Transaction 정상 시 성공 메세지 출력
