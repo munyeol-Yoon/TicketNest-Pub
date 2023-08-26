@@ -17,6 +17,7 @@ import subRedis from 'ioredis';
 export class BookingService {
   private redisClient: Redis;
   private redlock: Redlock;
+  private publisher: Redis;
   private subscriber: Redis;
   constructor(
     @InjectRepository(BookingEntity)
@@ -27,7 +28,14 @@ export class BookingService {
     @Inject('REDIS_CLIENT') redisClient: Redis,
   ) {
     this.redisClient = redisClient;
-    this.subscriber = new subRedis(); // 구독을 위해 별도의 클라이언트 생성
+    this.subscriber = new subRedis({
+      host: '127.0.0.1',
+      port: 6379,
+    }); // 구독을 위해 별도의 클라이언트 생성
+
+    this.publisher = new Redis();
+    this.subscriber = new Redis();
+
     this.redlock = new Redlock([redisClient], {
       driftFactor: 0.01, // clock drift를 보상하기 위해 driftTime 지정에 사용되는 요소, 해당 값과 아래 ttl값을 곱하여 사용.
       retryCount: 10, // 에러 전까지 재시도 최대 횟수
@@ -39,10 +47,9 @@ export class BookingService {
     this.subscriber.subscribe('Ticket');
     this.subscriber.on('message', async (channel, message) => {
       if (channel === 'Ticket') {
-        // const data = JSON.parse(message);
         try {
-          // await this.createBooking(data.goodsId, data.userId);
           console.log(message);
+          await this.handleWaitersInQueue();
         } catch (err) {
           console.error(err);
         }
@@ -57,7 +64,6 @@ export class BookingService {
     const channel = 'Ticket';
     const lockResource = [`goodsId:${goodsId}:lock`]; // 락을 식별하는 고유 문자열
     const lock = await this.redlock.acquire(lockResource, 2000); // 2초 뒤에 자동 잠금해제
-
     const qb = queryRunner.manager.createQueryBuilder();
     try {
       // 1. 예매수 및 Limit 확인
@@ -105,7 +111,10 @@ export class BookingService {
         // throw new ConflictException({
         //   errorMessage: '남은 좌석이 없습니다.',
         // });
-        await this.redisClient.lpush(`waitlist:${goodsId}`, userId);
+        await this.redisClient.lpush(
+          `waitlist:${goodsId}`,
+          JSON.stringify({ goodsId, userId }),
+        );
         return { message: '예매가 초과되어 대기자 명단에 등록 되었습니다' };
       }
 
@@ -140,12 +149,16 @@ export class BookingService {
       bookingSaveSpan.end();
 
       await queryRunner.commitTransaction();
+      await lock.release();
     } catch (err) {
+      await this.redisClient.lpush(
+        `waitlist:${goodsId}`,
+        JSON.stringify({ goodsId, userId }),
+      );
       await queryRunner.rollbackTransaction();
       // error를 Transaction 블록 외부로 던지기 위함
       throw err;
     } finally {
-      await lock.release();
       await queryRunner.release();
       await this.redisClient.publish(
         channel,
@@ -154,6 +167,27 @@ export class BookingService {
     }
     // Transaction 정상 시 성공 메세지 출력
     return { message: '예약 성공!' };
+  }
+
+  async handleWaitersInQueue() {
+    const nextRequest = await this.redisClient.rpop('queue');
+
+    if (nextRequest) {
+      const data = JSON.parse(nextRequest);
+      try {
+        const lockResource = `goodsId:${data.goodsId}:lock`;
+        const lock = await this.redlock.acquire([lockResource], 1000);
+
+        await this.createBooking(data.goodsId, data.userId);
+
+        lock.release();
+      } catch (e) {
+        await this.redisClient.lpush(
+          `queue:goodsId:${data.goodsId}`,
+          nextRequest,
+        );
+      }
+    }
   }
 
   async deleteBooking(goodsId: number, userId: number) {
