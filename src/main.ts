@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService: ConfigService = app.get(ConfigService);
-
   apm.start({
     serviceName: 'API_POST_TEST',
     serverUrl: configService.get<string>('APM_SERVER_URL'),
