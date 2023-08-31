@@ -11,7 +11,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
+import { AllExceptionsFilter } from './filters/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -41,6 +41,7 @@ async function bootstrap() {
     credentials: true, // 자격 증명 포함. true 일 경우 Access-Control-Allow-Origin 헤더는 와일드 카드를 사용할 수 없음.
     // exposedHeaders: ['Authorization'], // CORS 요청 후 클라이언트 측에서 브라우저가 액세스할 수 있는 헤더
   });
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(8080);
 }
