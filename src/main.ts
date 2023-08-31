@@ -5,6 +5,8 @@ apm.start({
   serviceName: 'API_POST_TEST',
   serverUrl: process.env.APM_SERVER_URL,
   logLevel: 'off',
+  logUncaughtExceptions: true,
+  captureErrorLogStackTraces: 'always',
 });
 
 import { NestFactory } from '@nestjs/core';
