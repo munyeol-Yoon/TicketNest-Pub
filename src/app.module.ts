@@ -35,13 +35,7 @@ const configService = new ConfigService();
     RedisModule,
   ],
   controllers: [AppController],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ApmInterceptor,
-    },
-    AppService,
-  ],
+  providers: [AppService],
 })
 export class AppModule {}
 //   implements NestModule {
