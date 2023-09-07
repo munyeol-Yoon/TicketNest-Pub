@@ -11,7 +11,7 @@ RUN npm i pm2 -g
 
 RUN npm run build 
 
-RUN npm run migration:run
+# RUN npm run migration:run
 
 EXPOSE 8080
 
