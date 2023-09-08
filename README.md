@@ -4,11 +4,11 @@
 
 ## 프로젝트 소개
 
-대용량 트래픽 핸들링을 타겟팅한 티겟팅 예매 소셜 이커머스입니다.
+대용량 트래픽 핸들링을 타게팅 한 티켓팅 예매 소셜 이커머스입니다.
 
 최근 온라인 서비스의 규모가 커지고 지속적으로 서버가 확장됨에 따라 운영 비용은 최소화하고 동시에 대규모 트래픽은 효율적으로 관리하고자 하는 기업이 늘어나고 있습니다.
 
-이에 따라, 현재의 트랜드를 따라가기 위해 제한된 조건을 가지고 동시성 제어, 확장성 및 고가용성을 우선시하는 시스템을 설계해보고자 시장 조사를 해본 결과 "티겟팅 서비스" 가 저희가 생각한 환경과 가장 유사하며 접근성이 좋은 주제이고, 순간적 or 지속적인 대용량 트래픽을 핸들링 하기에 적합하다고 생각하여 선택하게 되었습니다.
+이에 따라, 현재의 트렌드를 따라가기 위해 제한된 조건을 가지고 동시성 제어, 확장성 및 고가용성을 우선시하는 시스템을 설계해 보고자 시장 조사를 해본 결과 "티켓팅 서비스" 가 저희가 생각한 환경과 가장 유사하며 접근성이 좋은 주제이고, 순간적 or 지속적인 대용량 트래픽을 핸들링 하기에 적합하다고 생각하여 선택하게 되었습니다.
 
 
 FE-Repository : https://github.com/TicketNest/TicketNest-FE
@@ -31,9 +31,10 @@ Notion : https://www.notion.so/7-J-o-J-e21d060e8f474805aeef6a4828b37712
 
 <details>
 <summary><b>NestJS </b></summary>
-- 몰더 및 파일 구조를 잡아줌<br>
-- 컴파일 단계에서 에러를 미리 발견할 수 있어 생산성 향상<br>
-- 데이터 타입을 지정할 수 있어 개발자가 기대한 결과값과 다른 값이 반환되는 현상 방지<br>
+
+* 몰더 및 파일 구조를 잡아줌<br>
+* 컴파일 단계에서 에러를 미리 발견할 수 있어 생산성 향상<br>
+* 데이터 타입을 지정할 수 있어 개발자가 기대한 결괏값과 다른 값이 반환되는 현상 방지<br>
 </details>
 
 <details>
@@ -79,7 +80,7 @@ Notion : https://www.notion.so/7-J-o-J-e21d060e8f474805aeef6a4828b37712
 </details>
 
 <details>
-<summary><b>HAPROXY( 추가필요 )</b></summary>
+<summary><b>HAPROXY</b></summary>
 
 * 간단한 설치 및 설정
 * L4/L7 지원이 가능해 아키텍쳐 확장에 대한 유연성 보장
@@ -87,11 +88,10 @@ Notion : https://www.notion.so/7-J-o-J-e21d060e8f474805aeef6a4828b37712
 </details>
 
 <details>
-<summary><b>Pgpool-II ( 추가필요 )</b></summary>
+<summary><b>Pgpool-II</b></summary>
 
-* 내용 1
-* 내용 2
-* 내용 3<br>
+* PostgreSQL에 특화된 라이브러리로 최적의 성능과 기능 제공
+* 하나의 쿼리를 여러 서버에 동시 분산하여 응답 시간 단축<br>
 </details>
 
 ## 성능 개선
@@ -120,7 +120,7 @@ DB의 CPU와 I/O 부하 등 상태를 확인해 봤으나, 읽기/쓰기 모두 
 
 ### Solution
 
-DB에 데이터를 넣기 시작하면 발새아는 로그가 Instance에 상당한 부하를 주는 것을 확인하여 로그가 자동으로 생성되지 않도록 수정
+DB에 데이터를 넣기 시작하면 발생하는 로그가 Instance에 상당한 부하를 주는 것을 확인하여 로그가 자동으로 생성되지 않도록 수정
 
 |항목|적용 전|적용 후|변화량|
 |------|---|---|---|
@@ -221,9 +221,9 @@ Redis 분산락을 통한 동시성 제어 시도 실패
 
 </br>
 
-<span style="font-weight:bold">TPS : 110.3 -> 1040.7</span> <span style="color:skyblue; font-weight:bold">(약 845% 상승)</span>
+* <span style="font-weight:bold">TPS : 110.3 -> 1040.7</span> <span style="color:skyblue; font-weight:bold">(약 845% 상승)</span>
 
-<span style="font-weight:bold">Mean Time : 421.78ms -> 48.33ms</span> <span style="color:red; font-weight:bold">(약 89% 감소)</span>
+* <span style="font-weight:bold">Mean Time : 421.78ms -> 48.33ms</span> <span style="color:red; font-weight:bold">(약 89% 감소)</span>
 
 
 </br>
@@ -264,8 +264,8 @@ Redis 분산락을 통한 동시성 제어 시도 실패
 - Transaction은 Read COMMITED로 설정하고, Find Method에 Write Lock을 걸어 동시성을 제어한다.
   -  더 높은 Isolate Level이나, Read Lock(공유락)을 설정 시 DeadLock 현상이 발생하는 문제점
 
-- Count Method는 Row수준의 Lock이 걸리지 않는 부분을 확인하였다
-  -  Table 전체를 조회하여 해당하는 Row의 갯수를 Count하기 때문에 Row 수준의 Lock은 걸리지 않는다.
+- Count Method는 Row 수준의 Lock이 걸리지 않는 부분을 확인하였다
+  -  Table 전체를 조회하여 해당하는 Row의 갯수를 Count 하기 때문에 Row 수준의 Lock은 걸리지 않는다.
 
 - 따라서, Goods Table에 BookingCount Column을 추가한 뒤, 해당 Row에 Write Lock을 적용하였다.
 
@@ -278,7 +278,7 @@ Redis 분산락을 통한 동시성 제어 시도 실패
 
 **`❗  Issue`**
 
-- 약 VUser 3500 / Run Count 1000 이상의 부하조건에서 504 Gateway Time-Out Error 발생
+- 약 VUser 3500 / Run Count 1000 이상의 부하 조건에서 504 Gateway Time-Out Error 발생
 
 **`💡  Solution`**
 - 한 서버가 다른 서버로부터 제때 응답을 받지 못했기 때문에 로드 밸런서의 timeout 값 설정을 통해 자체 대기 시간 및 리소스 제한 해결<br>
