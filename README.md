@@ -104,11 +104,11 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 
 </br>
 
-<span style="font-size:1.2rem">
+
 <span style="font-weight:bold">TPS : 110.3 -> 1040.7</span> <span style="color:skyblue; font-weight:bold">(약 845% 상승)</span>
 
 <span style="font-weight:bold">Mean Time : 421.78ms -> 48.33ms</span> <span style="color:red; font-weight:bold">(약 89% 감소)</span>
-</span>
+
 
 </br>
 
