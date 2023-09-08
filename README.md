@@ -81,9 +81,9 @@ Notion : https://www.notion.so/7-J-o-J-e21d060e8f474805aeef6a4828b37712
 <details>
 <summary><b>HAPROXY( 추가필요 )</b></summary>
 
-* 내용 1
-* 내용 2
-* 내용 3<br>
+* 간단한 설치 및 설정
+* L4/L7 지원이 가능해 아키텍쳐 확장에 대한 유연성 보장
+* 실시간 모니터링으로 서버별 상태 지속 파악 가능
 </details>
 
 <details>
