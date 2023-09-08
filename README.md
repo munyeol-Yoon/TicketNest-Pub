@@ -12,7 +12,7 @@
 
 ## 서비스 아키텍처
 
-<img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/be92030e-4ba2-4bf5-80d6-45a6f6e96f76" width="75%">
+<img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/4bcbb734-ca43-4778-bbfe-df0c5c237ebd" width="75%">
 
 ## ERD
 
@@ -95,7 +95,7 @@
 
 **`💡  Solution`**
 - Public IPv4 / Private IPv4 차이점을 활용
-- 도커 컨테이너의 -p 옵션을 통해 호스트와 별도의 네트워크 연결 처리
+- 도커 컨테이너의 -p 옵션을 통해 호스트와 별도의 네트워크 연결 처리<br>
 
 </details>
 
@@ -107,7 +107,7 @@
 
 **`💡  Solution`**
 - goods_entity 테이블에 BookingCount라는 새로운 Column을 생성하여 Write Lock을 걸어 Row 수준에서의 Lock 진행
-- 이를 통해 API에 다수의 사용자가 동시에 접근했을 때 순차적으로 예매할 수 있도록 설정
+- 이를 통해 API에 다수의 사용자가 동시에 접근했을 때 순차적으로 예매할 수 있도록 설정<br>
 
 </details>
 
@@ -118,7 +118,7 @@
 - 부하 테스트 중 504 Gateway Time-out Error
 
 **`💡  Solution`**
-- 한 서버가 다른 서버로부터 제때 응답을 받지 못했기 때문에 로드 밸런서의 timeout 값 설정을 통해 자체 대기 시간 및 리소스 제한 해결
+- 한 서버가 다른 서버로부터 제때 응답을 받지 못했기 때문에 로드 밸런서의 timeout 값 설정을 통해 자체 대기 시간 및 리소스 제한 해결<br>
 
 </details>
 
