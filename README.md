@@ -70,7 +70,7 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 </details>
 
 <details>
-<summary><b>Elastic APM ( 추가필요 )</b></summary>
+<summary><b>Elastic APM</b></summary>
 
 * 작업 처리 소요 시간에 대한 자세한 가시화 데이터
 * 병목 현상 지점 파악 용이
@@ -92,6 +92,25 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 * 내용 2
 * 내용 3<br>
 </details>
+
+## 성능 개선
+
+<img src="https://github.com/munyeol-Yoon/mini-BE/assets/50113066/cf2d5d01-92e2-452a-843e-ece298ecb536" />
+
+||초기단계|SQL 로그 제거|쿼리 최적화|Redis Cache|Redis Pub/Sub|
+|------|---|---|---|---|---|
+|TPS|110.3|172.9|175.4|657.7|1040.7|
+|MTT|421.78ms|286.45ms|278.36ms|73.59ms|48.33ms|
+
+</br>
+
+<span style="font-size:1.2rem">
+<span style="font-weight:bold">TPS : 110.3 -> 1040.7</span> <span style="color:skyblue; font-weight:bold">(약 845% 상승)</span>
+
+<span style="font-weight:bold">Mean Time : 421.78ms -> 48.33ms</span> <span style="color:red; font-weight:bold">(약 89% 감소)</span>
+</span>
+
+</br>
 
 ## Trouble Shooting
 
@@ -165,3 +184,12 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 | Cloud & OS   | <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white"> <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white">                                                                                                              |
 | Load Balance | <img src="https://img.shields.io/badge/haproxy-E95420?style=for-the-badge&logo=haproxy&logoColor=white"> <img src="https://img.shields.io/badge/pgpool-E95420?style=for-the-badge&logo=pgpool&logoColor=white">                                                                                                                    |
 | Etc          | <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"> <img src="https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white">                                                                                                        |
+
+## 구성원
+
+|역할|이름|깃허브|
+|------|---|---|
+|BE(팀장)|윤문열|https://github.com/munyeol-Yoon|
+|BE|박형주|https://github.com/Hangju0610|
+|BE|신성윤|https://github.com/since1630|
+|BE|이상한|https://github.com/tkdgks7036|
