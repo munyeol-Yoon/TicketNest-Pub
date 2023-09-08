@@ -10,32 +10,88 @@
 
 이에 따라, 현재의 트랜드를 따라가기 위해 제한된 조건을 가지고 동시성 제어, 확장성 및 고가용성을 우선시하는 시스템을 설계해보고자 시장 조사를 해본 결과 "티겟팅 서비스" 가 저희가 생각한 환경과 가장 유사하며 접근성이 좋은 주제이고, 순간적 or 지속적인 대용량 트래픽을 핸들링 하기에 적합하다고 생각하여 선택하게 되었습니다.
 
+
 FE-Repository : https://github.com/TicketNest/TicketNest-FE
 
 Pub-Repository : https://github.com/TicketNest/TicketNest-Pub
 
 Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 
+
 ## 서비스 아키텍처
 
-<img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/be92030e-4ba2-4bf5-80d6-45a6f6e96f76">
+<img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/4bcbb734-ca43-4778-bbfe-df0c5c237ebd" width="75%">
 
 ## ERD
 
-``
 <img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/61d7d574-c72d-4593-9913-b1174a8bd65b" width="75%">
 
 ## 기술적 의사 결정
 
-| 사용 기술                | 기술 설명                                         |
-| ------------------------ | ------------------------------------------------- |
-| **NestJS**               | - 몰더 및 파일 구조를 잡아줌 </br>- 컴파일 단계에서 에러를 미리 발견할 수 있어 생산성 향상 </br>- 데이터 타입을 지정할 수 있어 개발자가 기대한 결과값과 다른 값이 반환되는 현상 방지 </br> - 회사의 선호도   |
-| **postgreSQL & TypeORM** | - 대용량 트래픽을 제어할 때 데이터 읽기만 하는 것이 아니라 쓰는 것도 고려해야함 </br> - PostgreSQL은 테이블 간 복잡한 쿼리를 처리함에 있어 이점이 있음 </br> - PostgreSQL 은 ACID 속성 지원함  </br> - TypeORM 은 NestJS 공식 ORM 의 안정적 지원 및 준수한 성능 |
-| **Redis**                | - 높은 처리속도 </br> - Pub/Sub 과 In-Memory 캐싱 기술 </br> - 시스템 운용 범위가 줄어듬 |
-| **nGrinder**             | - 비교적 쉬운 설치 과정과 요소들로 구성 </br> - 국내 커뮤니티 존재 </br> -  </br> - 내용4 |
-| **Elastic APM**          | - 트랜잭션에 소요되는 시간 학인 가능 </br> - 병목 현상 파악 |
-| **HAPROXY & Pgpool-II**  | - 부하를 균등하게 맞추기 위해 사용 </br> - 내용2 </br> - 내용3 </br> - 내용4 |
-| **AWS**                  | - AWS의 다양한 서비스를 통해 아키텍처의 확장을 쉽게 할 수 있음 </br> - 회사의 선호도 </br> - 내용3 </br> - 내용4 |
+<details>
+<summary><b>NestJS </b></summary>
+- 몰더 및 파일 구조를 잡아줌<br>
+- 컴파일 단계에서 에러를 미리 발견할 수 있어 생산성 향상<br>
+- 데이터 타입을 지정할 수 있어 개발자가 기대한 결과값과 다른 값이 반환되는 현상 방지<br>
+</details>
+
+<details>
+<summary><b>PostgreSQL</b></summary>
+
+* 오픈소스 기반 및 다양한 레퍼런스
+* 프로젝트 주제의 특성상 읽기 작업 못지않은 대량의 쓰기 작업
+* 추후 프로젝트 확장 및 테이블 관계의 복잡성에 대한 성능 보장<br>
+
+</details>
+
+
+<details>
+<summary><b>TypeORM</b></summary>
+
+* 쿼리의 복잡도가 상승함에 따른 가독성 및 성능 고려
+* 데이터 무결성을 위해 흐름 제어에 필요한 ACID 속성 지원
+* NestJS의 공식 ORM으로써 안정적인 지원과 준수한 성능<br>
+</details>
+
+<details>
+<summary><b>Redis</b></summary>
+
+* 메세지를 기록하지 않는 대신 높은 처리 속도 보장
+* 다양한 레퍼런스와 Learning Curve
+* Pub/Sub과 인메모링 캐싱 기술을 하나로 사용함에 따라 운용 범위 축소<br>
+</details>
+
+<details>
+<summary><b>nGrinder</b></summary>
+
+* 비교적 쉬운 설치 및 구성
+* 국내 커뮤니티 및 다양한 레퍼런스 존재
+* 여러 대의 Agent를 사용하여 대규모 부하 테스트 진행 가능<br>
+</details>
+
+<details>
+<summary><b>Elastic APM ( 추가필요 )</b></summary>
+
+* 작업 처리 소요 시간에 대한 자세한 가시화 데이터
+* 병목 현상 지점 파악 용이
+* Transaction에 소요되는 시간 체크<br>
+</details>
+
+<details>
+<summary><b>HAPROXY( 추가필요 )</b></summary>
+
+* 내용 1
+* 내용 2
+* 내용 3<br>
+</details>
+
+<details>
+<summary><b>Pgpool-II ( 추가필요 )</b></summary>
+
+* 내용 1
+* 내용 2
+* 내용 3<br>
+</details>
 
 ## Trouble Shooting
 
@@ -46,30 +102,9 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 
 - 애플리케이션 Instance -> PostgreSQL Instance 연결 실패
 
-**`💦Try`**
-
-- 에러메시지에 나온 IP 주소 값을 인바운드 규칙에 추가
-
-  - → 에러에 나온 주소의 출처는 엔드포인트의 IP로, 인바운드 규칙에 추가해 봤지만 연결에 실패하였다.
-
-- Docker에서 나오는 IP 주소 값을 인바운드 규칙에 추가
-
-  - → Docker의 Gateway, Container 등 내부 IP 주소 값을 추가해도 연결에 실패하였다.
-
-- ✅ Docker를 생성할 때 -p 옵션을 통한 IP 주소 설정
-
-  - → 포트 번호만 설정하지 않고, 접근하고자 하는 IP주소 값까지 설정
-
-```
-** 기존 시행착오
-sudo docker run --name ticketnest -d -p 8080:8080 munyeolyoon/ticketnest
-
-** 수정 후 시행착오
-sudo docker run --name ticketnest -d -p <IP Address>:8080:8080 munyeolyoon/ticketnest
-```
-
-
 **`💡  Solution`**
+- Public IPv4 / Private IPv4 차이점을 활용
+- 도커 컨테이너의 -p 옵션을 통해 호스트와 별도의 네트워크 연결 처리<br>
 
 - 인바운드 규칙을 통해 Instance에 접근 권한을 준 것은 ipv4 이다.
 - -p 옵션을 통해 호스트 IP 주소를 연결하고자 하는 Instance의 public ipv4로 설정하였다.
@@ -86,37 +121,10 @@ sudo docker run --name ticketnest -d -p <IP Address>:8080:8080 munyeolyoon/ticke
 
 - 다수의 User가 동시 접속 시 데이터 일관성이 지켜지지 않는 상태 발생
 
-**`💦Try`**
-
-- Transaction 을 적용하여 Test 진행
-  - 다수의 사용자가 동일한 BookingCount를 받는 현상 유지, 따라서 데이터 일관성이 깨지는 현상 발생
-
-- Transaction Level 변경하여 진행
-  - READ COMMITED와 REPETABLE READ의 경우 다수의 사용자가 동일한 BookingCount를 받는 현상 유지, SERIALIZABLE의 경우 가장 높은 격리 수준으로 동시성이 떨어지는 문제가 발생 
-
-- TypeORM Count Method에 Lock을 Read Lock or Write Lock을 설정해 동시성 제어 시도
-  - Count Method에는 Table Locks 수준을 걸어야 하기에, 비관적 락이 걸리지 않는 문제점 발생
-
-```
-const count: number = await queryRunner.manager.count(BookingEntity, {
-  where : { id : goodsId },
-	lock : { mode : 'pessimistic_write' },
-});
-```
-
-- ✅ Goods Table에 BookingCount Column을 새로 생성하고, 해당 Row에 Write Lock을 걸어 동시성 제어 진행
-  - Write Lock을 걸어 Row 수준에서의 잠금을 진행하고 다수의 User가 동시적으로 접근해도 순차적으로 예매가 가능
-
-```
-const findGoods = await queryRunner.manager.findOne(Goods, {
-  where: { id: goodsId },
-  // lock 수준을 배타락으로 설정
-  lock: { mode: 'pessimistic_write' },
-});
-```
-
 
 **`💡  Solution`**
+- goods_entity 테이블에 BookingCount라는 새로운 Column을 생성하여 Write Lock을 걸어 Row 수준에서의 Lock 진행
+- 이를 통해 API에 다수의 사용자가 동시에 접근했을 때 순차적으로 예매할 수 있도록 설정<br>
 
 - Transaction은 Read COMMITED로 설정하고, Find Method에 Write Lock을 걸어 동시성을 제어한다.
   -  더 높은 Isolate Level이나, Read Lock(공유락)을 설정 시 DeadLock 현상이 발생하는 문제점
@@ -137,15 +145,8 @@ const findGoods = await queryRunner.manager.findOne(Goods, {
 
 - 약 VUser 3500 / Run Count 1000 이상의 부하조건에서 504 Gateway Time-Out Error 발생
 
-**`💦Try`**
-
-- 로드 밸런서의 Timeout 시간을 늘려 에러를 줄였지만 해결책은 아니었음
-
-- 로드 밸런서의 디스크 I/O 작업량이 많은 것을 확인
-  - 로드 밸런서의 로그 기록 테스크를 제거한 후 다시 테스트 진행
-
-
 **`💡  Solution`**
+- 한 서버가 다른 서버로부터 제때 응답을 받지 못했기 때문에 로드 밸런서의 timeout 값 설정을 통해 자체 대기 시간 및 리소스 제한 해결<br>
 
 
 
