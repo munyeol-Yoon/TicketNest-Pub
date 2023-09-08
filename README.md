@@ -17,6 +17,7 @@ Pub-Repository : https://github.com/TicketNest/TicketNest-Pub
 
 Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 
+Notion : https://www.notion.so/7-J-o-J-e21d060e8f474805aeef6a4828b37712
 
 ## 서비스 아키텍처
 
@@ -104,6 +105,121 @@ Sub-Repository : https://github.com/TicketNest/TicketNest-sub
 
 </br>
 
+<details>
+<summary><b>Terminal 에서 SQL Log 제거</b></summary>
+
+### Issue
+
+EC2 Instance CPU 사용량 약 90% 과부하 상태 현상
+
+### Try
+
+DB의 CPU와 I/O 부하 등 상태를 확인해 봤으나, 읽기/쓰기 모두 일정한 패턴
+
+서버를 Scale Up 해봤지만, CPU 사용량 80%로 여전히 높은 현상
+
+### Solution
+
+DB에 데이터를 넣기 시작하면 발새아는 로그가 Instance에 상당한 부하를 주는 것을 확인하여 로그가 자동으로 생성되지 않도록 수정
+
+|항목|적용 전|적용 후|변화량|
+|------|---|---|---|
+|TPS|110.3|172.9|약 57% 상승|
+|Mean Time|421.78ms|286.45ms|약 68% 감소|
+|CPU 사용량|80%|40%|40% 감소|
+
+
+</details>
+<details>
+<summary><b>쿼리 최적화(Dynamic Query)</b></summary>
+
+### Issue
+
+CreateBooking API 호출 시 Latency가 낮은 현상
+
+### Try
+
+goods entity의 BookingCount Update 시 TypeORM의 Save Method를 사용할 경우, Select 문을 통해 해당하는 id Column을 전체 조회 후 Update를 진행하는 형태의 쿼리를 확인하여 최적화 시도
+
+### Solution
+
+TypeORM의 QueryBuilder를 통해 동적 쿼리를 구현하여 TPS 및 MTT 개선
+
+|항목|적용 전|적용 후|변화량|
+|------|---|---|---|
+|TPS|138.4|175.4|약 21% 상승|
+|Mean Time|357.67ms|275.05ms|약 22% 감소|
+
+</details>
+<details>
+<summary><b>Redis Cache</b></summary>
+
+### Issue
+
+QueryBuilder를 통해 동적 쿼리를 사용하여 Latency, TPS 등 성능 향상은 했지만 여전히 절댓값은 크지 않은 현상
+
+### Try
+
+네트워크 피크 값이 발생하지 않고, 시스템 부하도 낮은 상태에서 디스크 I/O 값만 높은 상태여서 DB의 구조적 한계로 판단하여 Redis Cache 적용 시도
+
+### Solution
+
+Redis Cache를 통해 DB의 부하를 줄여서 CPU 사용량을 개선하고, Cache를 통해 데이터에 접근하기 때문에 TPS 및 Mean Time까지 개선
+
+|항목|적용 전|적용 후|변화량|
+|------|---|---|---|
+|TPS|215.4|657.7|약 205% 상승|
+|Mean Time|226.05ms|73.59ms|약 67% 감소|
+|CPU 사용량|40~50%|80%|30~40% 상승|
+
+</details>
+<details>
+<summary><b>Redis Pub/Sub</b></summary>
+
+### Issue 
+
+In-memory 기반의 Redis Cache를 사용하여 전반적인 성능은 개선했지만, 동시성 제어의 실패
+
+### Try
+
+Redis 분산락을 통한 동시성 제어 시도 실패
+
+### Solution
+
+- 여러 개의 Pub에서 Message를 비동기적으로 발행하기 때문에 성능이 개선됨과 동시에 Queue는 순차적으로 Message를 저장하기 때문에 동시성 제어 또한 해결
+
+- Queue로 인해 순차적으로 저장되기 때문에 Transaction의 필요성이 사라지며 로직의 간소화
+
+|항목|적용 전|적용 후|변화량|
+|------|---|---|---|
+|TPS|657.7|1,040.7|약 585% 상승|
+|Mean Time|73.59ms|48.33ms|약 34% 감소|
+|CPU 사용량|80%|65%|15% 감소|
+
+
+</details>
+<details>
+<summary><b>Scale Out</b></summary>
+
+### Issue
+
+성능 개선 및 동시성 제어에 유의미한 결과를 얻었지만, 사용자 수를 증가시켜도 더 이상 TPS 가 상승하지 않는 현상
+
+### Solution
+
+다수의 서버를 로드 밸런서를 통해 연결 및 분산하여 추가적인 TPS 상승
+
+|항목|적용 전|적용 후|변화량|
+|------|---|---|---|
+|TPS|1,252|3,066|약 245% 상승|
+|Mean Time|1,588ms|604.58ms|약 40% 감소|
+|CPU 사용량|100%|약 80%|20% 감소|
+|Run Time|13m 46s|5m 54s|약 57% 감소|
+
+
+</details>
+
+</br>
 
 <span style="font-weight:bold">TPS : 110.3 -> 1040.7</span> <span style="color:skyblue; font-weight:bold">(약 845% 상승)</span>
 
