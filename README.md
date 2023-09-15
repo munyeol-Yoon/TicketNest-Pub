@@ -1,5 +1,9 @@
 # Final Project : TicketNest
 
+<img src="https://github.com/munyeol-Yoon/mini-BE/assets/50113066/149f7b9c-e83f-4919-859d-b6fbe3dd4821">
+
+<br/>
+
 <img src="https://github.com/tkdgks7036/prac_code_JS/assets/133713235/e0ff6101-8702-4591-bb5a-3bbb54d909fa">
 
 ## 프로젝트 소개
